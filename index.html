@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Strenght In Numbers</title>
+  <link rel="stylesheet" href="static/css/style.min.css">
+  <link rel="stylesheet" href="https://raw.githubusercontent.com/alangrafu/radar-chart-d3/master/src/radar-chart.min.css">
+
+
+  <script type="text/javascript" src="http://d3js.org/d3.v3.js"></script>
+  <script type="text/javascript" src="https://raw.githubusercontent.com/alangrafu/radar-chart-d3/master/src/radar-chart.min.js"></script>
+</head>
+<body>
+  <div class="row min-h-4">
+    <header class="header header-inline min-h-3 row desktop-12 container" role="banner">
+      <div class="site-logo">
+        <h1> Strenght In Numbers</h1>
+      </div>
+    </header>
+  </div>
+
+  <div class="content desktop-12 container">
+    <div id="FormPulldown" class="form-row-66 label-block select-dropdown col-33">
+      <label for="gsw">Golden State Warriors Players</label>
+      <select id="gsw" name="gsw">
+        <option value="" onclick="renderRadar()">Choose a player from GSW</option>
+        <option value="curry" onclick="renderRadar()">Stephen Curry</option>
+        <option value="thompson" onclick="renderRadar()">Klay Thompson</option>
+        <option value="barnes" onclick="renderRadar()">Harrison Barnes</option>
+        <option value="dgreen" onclick="renderRadar()">Draymond Green</option>
+        <option value="bogut" onclick="renderRadar()">Andrew Bogut</option>
+      </select>
+    </div>
+
+    <div id="FormPulldown" class="form-row-66 label-block select-dropdown col-33">
+      <label for="mem">Memphis Grizzlies Players</label>
+      <select id="mem" name="mem">
+        <option value="" onclick="renderRadar()">Choose a player from MEM</option>
+        <option value="conley" onclick="renderRadar()">Mike Conley</option>
+        <option value="lee" onclick="renderRadar()">Courtney Lee</option>
+        <option value="jgreen" onclick="renderRadar()">Jeff Green</option>
+        <option value="randolph" onclick="renderRadar()">Zach Randolph</option>
+        <option value="gasol" onclick="renderRadar()">Marc Gasol</option>
+      </select>
+    </div>
+    <div class="chart-container"></div>
+  </div>
+
+  <script>
+    var data = [];
+    function renderRadar() {
+      d3.selectAll('select').each(function (element, index) {
+        var val = this.value;
+        if (val) {
+          d3.csv('static/csv/' + val + '.csv')
+            .row(function (d) {
+                return {'assists': +d['AST'], 'rebounds': +d['DRB'] + +d['ORB'], 'points': +d['PTS']};
+            })
+            .get(function (error, rows) {
+              axes = [
+                {axis: 'Points per game', value: d3.sum(rows, function(d) {
+                  return +d['points'] / rows.length;}
+                )},
+                {axis: 'Assists per game', value: d3.sum(rows, function(d) {
+                  return +d['assists'] / rows.length;}
+                )},
+                {axis: 'Rebounds per game', value: d3.sum(rows, function(d) {
+                  return +d['rebounds'] / rows.length;}
+                )},
+              ]
+              data.push({'axes': axes})
+              console.log(data);
+              RadarChart.draw(".chart-container", data);
+            });
+        }
+      });
+      data = []
+    }
+
+  document.addEventListener("DOMContentLoaded", function(event) {
+    renderRadar();
+  });
+  </script>
+
+</body>
+</html>
